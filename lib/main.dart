@@ -134,23 +134,32 @@ class _MyHomePageState extends State<MyHomePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  const Text('Tot:'),
+                  const Text('Tot: '),
                   Text(
-                    '$total€',
+                    '$total €',
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
-                  const Text('Diff:'),
+                  const Spacer(),
+                  const Text('Diff: '),
                   Text(
-                    '$diff€',
+                    '$diff €',
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
-                  const Text('#:'),
-                  Text(
-                    '$ticketNum',
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
+                  const Spacer(flex: 2),
                 ],
               ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  const Spacer(),
+                  const Text('# tickets: '),
+                  Text(
+                    '$ticketNum x $ticketPrice €',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  const Spacer(),
+                ],
+              )
             ],
           ),
         ),
