@@ -35,14 +35,6 @@ class _MyHomePageState extends State<MyHomePage> {
   int ticketNum = 0;
   double diff = 0;
 
-  void _removeItem(int index) {
-    setState(() {
-      items.removeAt(index);
-      controllers[index].dispose();
-      controllers.removeAt(index);
-    });
-  }
-
   void __addItem() {
     final newController = TextEditingController();
     controllers.add(newController);
@@ -59,6 +51,14 @@ class _MyHomePageState extends State<MyHomePage> {
   void _addItem() {
     setState(() {
       __addItem();
+    });
+  }
+
+  void _removeItem(int index) {
+    setState(() {
+      items.removeAt(index);
+      controllers[index].dispose();
+      controllers.removeAt(index);
     });
   }
 
@@ -109,54 +109,50 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          // mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            GridView.count(
-              shrinkWrap: true,
-              crossAxisCount: 2,
-              childAspectRatio: 2.0,
-              children: List.generate(items.length, (int index) {
-                return ListTile(
-                  leading: const Icon(Icons.radio_button_unchecked),
-                  title: items[index],
-                  trailing: IconButton(
-                    onPressed: () {
-                      _removeItem(index);
-                    },
-                    tooltip: 'Delete item',
-                    icon: const Icon(Icons.clear),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              GridView.count(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                crossAxisCount: 2,
+                childAspectRatio: 3,
+                children: List.generate(items.length, (int index) {
+                  return ListTile(
+                    leading: const Icon(Icons.radio_button_unchecked),
+                    title: items[index],
+                    trailing: IconButton(
+                      onPressed: () {
+                        _removeItem(index);
+                      },
+                      tooltip: 'Delete item',
+                      icon: const Icon(Icons.clear),
+                    ),
+                  );
+                }),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  const Text('Tot:'),
+                  Text(
+                    '$total€',
+                    style: Theme.of(context).textTheme.headlineMedium,
                   ),
-                );
-              }),
-            ),
-            const Text('Totale:'),
-            Text(
-              '$total€',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            const Text('Differenza:'),
-            Text(
-              '$diff€',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            const Text('# ticket:'),
-            Text(
-              '$ticketNum',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+                  const Text('Diff:'),
+                  Text(
+                    '$diff€',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  const Text('#:'),
+                  Text(
+                    '$ticketNum',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
