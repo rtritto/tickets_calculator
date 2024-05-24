@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'item.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,29 +29,46 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final double ticketPrice = 9.3;
-  List<Item> items = [Item()];
+  List<Widget> items = [];
+  List<TextEditingController> controllers = [];
   double total = 0;
   int ticketNum = 0;
+  double diff = 0;
 
   void _removeItem(int index) {
     setState(() {
       items.removeAt(index);
+      controllers[index].dispose();
+      controllers.removeAt(index);
     });
+  }
+
+  void __addItem() {
+    final newController = TextEditingController();
+    controllers.add(newController);
+    items.add(TextField(
+      controller: newController,
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+      ],
+      onChanged: (value) => _handleOnChange(value, items.length),
+    ));
   }
 
   void _addItem() {
     setState(() {
-      items.add(Item());
+      __addItem();
     });
   }
 
   double _calculateTotal() {
     double sum = 0;
-    items
-        .map((item) => item.price)
-        .where((price) => price != null)
+    controllers
+        .map((controller) =>
+            double.parse(controller.text == '' ? '0' : controller.text))
         .forEach((double? e) => sum += e!);
-    return sum;
+    return double.parse(sum.toStringAsFixed(2));
   }
 
   int _calculateTicketNum() {
@@ -65,10 +81,24 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _handleOnChange(String value, int index) {
     setState(() {
-      items[index].price = value.isEmpty == true ? null : double.parse(value);
       total = _calculateTotal();
       ticketNum = _calculateTicketNum();
+      diff = _calculateDiff();
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    __addItem();
+  }
+
+  @override
+  void dispose() {
+    for (var controller in controllers) {
+      controller.dispose();
+    }
+    super.dispose();
   }
 
   @override
@@ -93,61 +123,23 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           // mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // GridView.count(
-            //   shrinkWrap: true,
-            //   crossAxisCount: 2,
-            //   childAspectRatio: 2.0,
-            //   children: List.generate(items.length, (index) {
-            //     return ListTile(
-            //       leading: const Icon(Icons.radio_button_unchecked),
-            //       title: TextField(
-            //           keyboardType:
-            //               const TextInputType.numberWithOptions(decimal: true),
-            //           inputFormatters: [
-            //             FilteringTextInputFormatter.allow(
-            //                 RegExp(r'^\d+\.?\d{0,2}')),
-            //           ],
-            //           onChanged: (value) {
-            //             items[index].price =
-            //                 value.isEmpty == true ? null : double.parse(value);
-            //             total = _calculateTotal();
-            //             ticketNum = _calculateTicketNum();
-            //             setState(() {});
-            //           }),
-            //       trailing: IconButton(
-            //         onPressed: () {
-            //           _removeItem(index);
-            //         },
-            //         tooltip: 'Delete item',
-            //         icon: const Icon(Icons.delete),
-            //       ),
-            //     );
-            //   }),
-            // ),
-            ListView.builder(
+            GridView.count(
               shrinkWrap: true,
-              itemCount: items.length,
-              itemBuilder: (context, index) {
+              crossAxisCount: 2,
+              childAspectRatio: 2.0,
+              children: List.generate(items.length, (int index) {
                 return ListTile(
                   leading: const Icon(Icons.radio_button_unchecked),
-                  title: TextField(
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(
-                          RegExp(r'^\d+\.?\d{0,2}')),
-                    ],
-                    onChanged: (value) => _handleOnChange(value, index),
-                  ),
+                  title: items[index],
                   trailing: IconButton(
                     onPressed: () {
                       _removeItem(index);
                     },
                     tooltip: 'Delete item',
-                    icon: const Icon(Icons.delete),
+                    icon: const Icon(Icons.clear),
                   ),
                 );
-              },
+              }),
             ),
             const Text('Totale:'),
             Text(
@@ -156,7 +148,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             const Text('Differenza:'),
             Text(
-              '${_calculateDiff().toString()}€',
+              '$diff€',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const Text('# ticket:'),
