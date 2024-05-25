@@ -124,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(213, 15, 88, 147),
+        backgroundColor: Colors.lightBlue.shade900,
         title: Text(widget.title),
       ),
       body: Center(
@@ -184,9 +184,11 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _addItem,
         tooltip: 'Add item',
-        child: const Icon(Icons.add),
+        backgroundColor: Colors.lightBlue.shade900,
+        shape: const CircleBorder(),
+        onPressed: _addItem,
+        child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
     );
   }
