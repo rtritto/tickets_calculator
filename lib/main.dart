@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Tickets Calculator',
       theme: ThemeData.dark(),
       home: const MyHomePage(title: 'Tickets Calculator'),
     );
@@ -19,9 +19,9 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
   final String title;
+
+  const MyHomePage({super.key, required this.title});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -29,23 +29,43 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final double ticketPrice = 9.3;
-  List<Widget> items = [];
-  List<TextEditingController> controllers = [];
+  final List<Widget> items = [];
+  final List<TextEditingController> controllers = [];
   double total = 0;
-  int ticketNum = 0;
   double diff = 0;
+  int ticketNum = 0;
 
   void __addItem() {
     final newController = TextEditingController();
     controllers.add(newController);
+    final int index = items.length;
     items.add(TextField(
       controller: newController,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       inputFormatters: [
         FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
       ],
-      onChanged: (value) => _handleOnChange(value, items.length),
+      onChanged: (value) => _handleOnChange(value, index),
+      onTapOutside: (event) => {
+        controllers[index].text =
+            __fixDoubleNumToShow(double.parse(controllers[index].text))
+      },
     ));
+  }
+
+  void __updateVars() {
+    total = _calculateTotal();
+    ticketNum = _calculateTicketNum();
+    diff = _calculateDiff();
+  }
+
+  double __fixDoubleNum(double inputDoubleNum) {
+    return double.parse(inputDoubleNum.toStringAsFixed(2));
+  }
+
+  String __fixDoubleNumToShow(double inputDoubleNum) {
+    List<String> splittedNums = inputDoubleNum.toStringAsFixed(2).split('.');
+    return '${splittedNums[0]}.${splittedNums[1].padRight(2, '0')}';
   }
 
   void _addItem() {
@@ -59,6 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
       items.removeAt(index);
       controllers[index].dispose();
       controllers.removeAt(index);
+      __updateVars();
     });
   }
 
@@ -68,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
         .map((controller) =>
             double.parse(controller.text == '' ? '0' : controller.text))
         .forEach((double? e) => sum += e!);
-    return double.parse(sum.toStringAsFixed(2));
+    return __fixDoubleNum(sum);
   }
 
   int _calculateTicketNum() {
@@ -76,14 +97,12 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   double _calculateDiff() {
-    return double.parse((total - (ticketNum * ticketPrice)).toStringAsFixed(2));
+    return __fixDoubleNum(total - (ticketNum * ticketPrice));
   }
 
   void _handleOnChange(String value, int index) {
     setState(() {
-      total = _calculateTotal();
-      ticketNum = _calculateTicketNum();
-      diff = _calculateDiff();
+      __updateVars();
     });
   }
 
@@ -136,13 +155,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: [
                   const Text('Tot: '),
                   Text(
-                    '$total €',
+                    '${__fixDoubleNumToShow(total)} €',
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   const Spacer(),
                   const Text('Diff: '),
                   Text(
-                    '$diff €',
+                    '${__fixDoubleNumToShow(diff)} €',
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   const Spacer(flex: 2),
