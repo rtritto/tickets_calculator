@@ -34,7 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final List<FocusNode> foci = [];
   double total = 0;
   double diff = 0;
-  int ticketNum = 0;
+  int ticketsNumberToUse = 0;
 
   void __addItem() {
     final newController = TextEditingController();
@@ -63,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void __updateVars() {
     total = _calculateTotal();
-    ticketNum = _calculateTicketNum();
+    ticketsNumberToUse = _calculateticketsNumberToUse();
     diff = _calculateDiff();
   }
 
@@ -105,12 +105,12 @@ class _MyHomePageState extends State<MyHomePage> {
     return __fixDoubleNum(sum);
   }
 
-  int _calculateTicketNum() {
+  int _calculateticketsNumberToUse() {
     return (total / ticketPrice).floor();
   }
 
   double _calculateDiff() {
-    return __fixDoubleNum(total - (ticketNum * ticketPrice));
+    return __fixDoubleNum(total - (ticketsNumberToUse * ticketPrice));
   }
 
   void _handleOnChange(String value, int index) {
@@ -189,7 +189,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   const Spacer(),
                   const Text('# tickets: '),
                   Text(
-                    '$ticketNum x $ticketPrice €',
+                    '$ticketsNumberToUse x $ticketPrice €',
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   const Spacer(),
