@@ -169,6 +169,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  const Spacer(),
                   const Text('Tot: '),
                   Text(
                     '${__fixDoubleNumToShow(total)} €',
