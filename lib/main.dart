@@ -31,6 +31,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final double ticketPrice = 9.3;
   final List<Widget> items = [];
   final List<TextEditingController> controllers = [];
+  final List<FocusNode> foci = [];
   double total = 0;
   double diff = 0;
   int ticketNum = 0;
@@ -38,8 +39,13 @@ class _MyHomePageState extends State<MyHomePage> {
   void __addItem() {
     final newController = TextEditingController();
     controllers.add(newController);
+
+    final FocusNode focusNode = FocusNode();
+    foci.add(focusNode);
+
     final int index = items.length;
     items.add(TextField(
+      focusNode: focusNode,
       controller: newController,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       inputFormatters: [
@@ -51,6 +57,8 @@ class _MyHomePageState extends State<MyHomePage> {
             __fixDoubleNumToShow(double.parse(controllers[index].text))
       },
     ));
+
+    focusNode.requestFocus();
   }
 
   void __updateVars() {
@@ -77,8 +85,13 @@ class _MyHomePageState extends State<MyHomePage> {
   void _removeItem(int index) {
     setState(() {
       items.removeAt(index);
+
       controllers[index].dispose();
       controllers.removeAt(index);
+
+      foci[index].dispose();
+      foci.removeAt(index);
+
       __updateVars();
     });
   }
@@ -116,6 +129,9 @@ class _MyHomePageState extends State<MyHomePage> {
   void dispose() {
     for (var controller in controllers) {
       controller.dispose();
+    }
+    for (var focus in foci) {
+      focus.dispose();
     }
     super.dispose();
   }
